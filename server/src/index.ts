@@ -15,7 +15,6 @@ const main = async () => {
   await createTypeormConnection();
   const app = express();
 
-  // Mount a jwt or other authentication middleware that is run before the GraphQL execution
   //decodes the user from authorization headers and sets the property req.user on them
   app.use(
     path,
