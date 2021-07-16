@@ -15,7 +15,11 @@ export class taskResolver {
     @Arg('status', { defaultValue: 'active' })
     status: 'active' | 'completed' | 'archived'
   ): Promise<Task> {
-    const task = Task.create({ title, status, user: (req.user as any).id });
+    const task = Task.create({
+      title,
+      status,
+      user: currentlyLoggedInUserId(req),
+    });
     await task.save();
     return task;
   }

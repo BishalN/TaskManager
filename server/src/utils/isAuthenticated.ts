@@ -1,6 +1,6 @@
-import { AuthChecker } from "type-graphql";
-import { User } from "../entity/User";
-import { MyContext } from "../types/MyContext";
+import { AuthChecker } from 'type-graphql';
+import { User } from '../entity/User';
+import { MyContext } from '../types/MyContext';
 
 export const isAuthenticated: AuthChecker<MyContext> = async ({
   root,
@@ -8,14 +8,14 @@ export const isAuthenticated: AuthChecker<MyContext> = async ({
   context,
   info,
 }) => {
-  const id = (context.req.user as any).id;
-  const user = await User.findOne(id);
-
-  if (user) {
-    //the user is authenticated
-    return true;
+  try {
+    const id = (context.req.user as any).id;
+    const user = await User.findOne(id);
+    if (user) {
+      return true;
+    }
+  } catch (error) {
+    return false;
   }
-
-  //User is not authenticated
   return false;
 };
