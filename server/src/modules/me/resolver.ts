@@ -5,7 +5,7 @@ import { currentlyLoggedInUserId } from '../../utils/currentlyLoggedUserId';
 
 @Resolver()
 export class helloResolver {
-  @Query(() => User)
+  @Query(() => User, { nullable: true })
   async me(@Ctx() { req }: MyContext) {
     const user = await User.findOne(currentlyLoggedInUserId(req));
     return user;
