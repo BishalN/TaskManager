@@ -1,24 +1,19 @@
-import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
-import { Task } from "../../entity/Task";
-import { User } from "../../entity/User";
-import { MyContext } from "../../types/MyContext";
+import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql';
+import { getConnection } from 'typeorm';
+import { Task } from '../../entity/Task';
+import { MyContext } from '../../types/MyContext';
+import { currentlyLoggedInUserId } from '../../utils/currentlyLoggedUserId';
+import { isUsersTask } from './isUsersTask';
 
 @Resolver()
 export class taskResolver {
   @Authorized()
-  @Query(() => User)
-  async ajay(@Ctx() { req }: MyContext) {
-    const user = await User.findOne((req.user as any).id);
-    return user;
-  }
-
-  @Authorized()
   @Mutation(() => Task)
   async createTask(
     @Ctx() { req }: MyContext,
-    @Arg("title") title: string,
-    @Arg("status", { defaultValue: "active" })
-    status: "active" | "completed" | "archived"
+    @Arg('title') title: string,
+    @Arg('status', { defaultValue: 'active' })
+    status: 'active' | 'completed' | 'archived'
   ): Promise<Task> {
     const task = Task.create({ title, status, user: (req.user as any).id });
     await task.save();
@@ -34,24 +29,43 @@ export class taskResolver {
   }
 
   @Authorized()
-  @Mutation(() => Task)
-  async deleteTask(@Ctx() { req }: MyContext, @Arg("id") id: string) {
-    const task = await Task.findOne(id);
-    if (!task) throw new Error("Task not found");
+  @Mutation(() => Boolean)
+  async deleteTask(@Ctx() { req }: MyContext, @Arg('id') id: string) {
+    const { message, result } = await isUsersTask(
+      id,
+      currentlyLoggedInUserId(req)
+    );
+    if (!result) throw new Error(message);
+    await Task.delete(id);
 
-    const isUsersTask = task.user === (req.user as any).id;
-    if (!isUsersTask) throw new Error("Unauthorized");
-
-    return Task.remove(task);
+    return true;
   }
 
   @Authorized()
   @Mutation(() => Task)
   async updateTask(
     @Ctx() { req }: MyContext,
-    @Arg("title") title: string,
-    @Arg("status") status: string
-  ) {}
+    @Arg('id') id: string,
+    @Arg('title', { nullable: true }) title: string,
+    @Arg('status', { nullable: true }) status: string
+  ) {
+    const { message, result } = await isUsersTask(
+      id,
+      currentlyLoggedInUserId(req)
+    );
+    if (!result) throw new Error(message);
+    const updatedTask = await getConnection()
+      .getRepository(Task)
+      .createQueryBuilder('task')
+      .update<Task>(Task, { title, status })
+      .where('task.id =:id', { id })
+      .returning('*')
+      .updateEntity(true)
+      .execute();
+    const taskResult = {
+      ...updatedTask.raw[0],
+      user: updatedTask.raw[0].userId,
+    };
+    return taskResult;
+  }
 }
-
-// we need the createTask,updateTask and delete task mutation along with a getall task for a particular user

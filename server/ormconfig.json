@@ -5,7 +5,6 @@
     "host": "localhost",
     "logging": true,
     "synchronize": true,
-    "dropSchema": true,
     "port": 5432,
     "username": "postgres",
     "password": "postgres",
