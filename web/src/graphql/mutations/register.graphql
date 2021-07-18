@@ -1,0 +1,7 @@
+mutation register($email: String!, $username: String!, $password: String!) {
+  register(input: { email: $email, password: $password, username: $username }) {
+    id
+    username
+    email
+  }
+}

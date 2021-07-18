@@ -1,5 +1,11 @@
+import { useQueryClient } from 'react-query';
+import { useRegisterMutation } from '../generated';
+
 function home() {
-  return <h1>this is the awesome page</h1>;
+  const queryClient = useQueryClient();
+  const { mutate } = useRegisterMutation({});
+
+  return <div>this is the awesome page</div>;
 }
 
 export default home;
