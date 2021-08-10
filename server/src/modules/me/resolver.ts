@@ -10,4 +10,9 @@ export class helloResolver {
     const user = await User.findOne(currentlyLoggedInUserId(req));
     return user;
   }
+
+  @Query(() => String)
+  hello() {
+    return "hello world"
+  }
 }

@@ -1,4 +1,4 @@
-import { useMutation, UseMutationOptions } from 'react-query';
+import { useMutation, UseMutationOptions, useQuery, UseQueryOptions } from 'react-query';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
@@ -72,6 +72,7 @@ export type MutationUpdateTaskArgs = {
 export type Query = {
   __typename?: 'Query';
   me?: Maybe<User>;
+  hello: Scalars['String'];
   getAllMyTasks: Array<Task>;
 };
 
@@ -110,13 +111,12 @@ export type RegisterMutationVariables = Exact<{
 }>;
 
 
-export type RegisterMutation = (
-  { __typename?: 'Mutation' }
-  & { register: (
-    { __typename?: 'User' }
-    & Pick<User, 'id' | 'username' | 'email'>
-  ) }
-);
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'User', id: string, username: string, email: string } };
+
+export type HelloQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type HelloQuery = { __typename?: 'Query', hello: string };
 
 
 export const RegisterDocument = `
@@ -134,5 +134,22 @@ export const useRegisterMutation = <
     >(options?: UseMutationOptions<RegisterMutation, TError, RegisterMutationVariables, TContext>) => 
     useMutation<RegisterMutation, TError, RegisterMutationVariables, TContext>(
       (variables?: RegisterMutationVariables) => fetcher<RegisterMutation, RegisterMutationVariables>(RegisterDocument, variables)(),
+      options
+    );
+export const HelloDocument = `
+    query hello {
+  hello
+}
+    `;
+export const useHelloQuery = <
+      TData = HelloQuery,
+      TError = unknown
+    >(
+      variables?: HelloQueryVariables, 
+      options?: UseQueryOptions<HelloQuery, TError, TData>
+    ) => 
+    useQuery<HelloQuery, TError, TData>(
+      ['hello', variables],
+      fetcher<HelloQuery, HelloQueryVariables>(HelloDocument, variables),
       options
     );

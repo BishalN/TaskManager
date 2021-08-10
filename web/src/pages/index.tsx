@@ -1,44 +1,44 @@
-import { TextField, Typography } from '@material-ui/core';
-import { createStyles, makeStyles, Theme } from '@material-ui/core';
-import { Flare } from '@material-ui/icons';
-import React from 'react';
-import { useQueryClient } from 'react-query';
-import { useRegisterMutation } from '../generated';
+import {
+  Box,
+  FormControl,
+  FormHelperText,
+  FormLabel,
+  Input,
+  VStack,
+} from "@chakra-ui/react";
+import { useRouter } from "next/dist/client/router";
+import React from "react";
+import { useHelloQuery, useRegisterMutation } from "../generated";
 
 function home() {
-  const queryClient = useQueryClient();
-  const { mutate } = useRegisterMutation({});
-
+  const router = useRouter();
+  const { mutate, isLoading, error, isError, isSuccess } = useRegisterMutation({
+    onSuccess: () => router.push("/dash"),
+  });
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <form style={{ width: '25%', marginTop: '20px' }}>
-        <TextField
-          required
-          label="username"
-          id="username"
-          fullWidth
-          margin="dense"
-          helperText="username must be unique"
-        />
-
-        <TextField required label="email" id="email" fullWidth margin="dense" />
-
-        <TextField
-          required
-          label="password"
-          id="password"
-          fullWidth
-          margin="dense"
-          helperText="password must be atleast 6 character long"
-        />
+    <Box display="flex" alignItems="center" justifyContent="center">
+      <form noValidate>
+        <VStack>
+          <FormControl id="email">
+            <FormLabel>Email address</FormLabel>
+            <Input type="email" />
+            <FormHelperText>We'll never share your email</FormHelperText>
+          </FormControl>
+          <FormControl id="username">
+            <FormLabel>Username</FormLabel>
+            <Input type="username" />
+          </FormControl>
+          <FormControl id="password">
+            <FormLabel>Password</FormLabel>
+            <Input type="password" />
+          </FormControl>
+          <FormControl id="confirmPassword">
+            <FormLabel>Confirm Password</FormLabel>
+            <Input type="password" />
+          </FormControl>
+        </VStack>
       </form>
-    </div>
+    </Box>
   );
 }
 

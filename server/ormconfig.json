@@ -7,7 +7,7 @@
     "synchronize": true,
     "port": 5432,
     "username": "postgres",
-    "password": "postgres",
+    "password": "ben",
     "entities": ["src/entity/**/*.ts"],
     "database": "taskmanager_dev"
   },
@@ -17,7 +17,7 @@
     "host": "localhost",
     "port": 5432,
     "username": "postgres",
-    "password": "postgres",
+    "password": "ben",
     "database": "taskmanager_test"
   }
 ]
