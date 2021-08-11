@@ -1,16 +1,28 @@
-import { useMutation, UseMutationOptions, useQuery, UseQueryOptions } from 'react-query';
+import {
+  useMutation,
+  UseMutationOptions,
+  useQuery,
+  UseQueryOptions,
+} from "react-query";
 export type Maybe<T> = T | null;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type Exact<T extends { [key: string]: unknown }> = {
+  [K in keyof T]: T[K];
+};
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
+  { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
+  { [SubKey in K]: Maybe<T[SubKey]> };
 
 function fetcher<TData, TVariables>(query: string, variables?: TVariables) {
   return async (): Promise<TData> => {
     const res = await fetch("http://localhost:4000/graphql", {
       method: "POST",
       body: JSON.stringify({ query, variables }),
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
-    
+
     const json = await res.json();
 
     if (json.errors) {
@@ -20,7 +32,7 @@ function fetcher<TData, TVariables>(query: string, variables?: TVariables) {
     }
 
     return json.data;
-  }
+  };
 }
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -32,93 +44,135 @@ export type Scalars = {
 };
 
 export type Mutation = {
-  __typename?: 'Mutation';
+  __typename?: "Mutation";
   register: User;
   login: LoginOutput;
   createTask: Task;
-  deleteTask: Scalars['Boolean'];
+  deleteTask: Scalars["Boolean"];
   updateTask: Task;
 };
-
 
 export type MutationRegisterArgs = {
   input: RegisterInput;
 };
 
-
 export type MutationLoginArgs = {
-  password: Scalars['String'];
-  email: Scalars['String'];
+  password: Scalars["String"];
+  email: Scalars["String"];
 };
-
 
 export type MutationCreateTaskArgs = {
-  status?: Maybe<Scalars['String']>;
-  title: Scalars['String'];
+  status?: Maybe<Scalars["String"]>;
+  title: Scalars["String"];
 };
-
 
 export type MutationDeleteTaskArgs = {
-  id: Scalars['String'];
+  id: Scalars["String"];
 };
 
-
 export type MutationUpdateTaskArgs = {
-  status?: Maybe<Scalars['String']>;
-  title?: Maybe<Scalars['String']>;
-  id: Scalars['String'];
+  status?: Maybe<Scalars["String"]>;
+  title?: Maybe<Scalars["String"]>;
+  id: Scalars["String"];
 };
 
 export type Query = {
-  __typename?: 'Query';
+  __typename?: "Query";
   me?: Maybe<User>;
-  hello: Scalars['String'];
+  hello: Scalars["String"];
   getAllMyTasks: Array<Task>;
 };
 
 export type Task = {
-  __typename?: 'Task';
-  id: Scalars['String'];
-  title: Scalars['String'];
-  status: Scalars['String'];
+  __typename?: "Task";
+  id: Scalars["String"];
+  title: Scalars["String"];
+  status: Scalars["String"];
 };
 
 export type User = {
-  __typename?: 'User';
-  id: Scalars['String'];
-  username: Scalars['String'];
-  email: Scalars['String'];
+  __typename?: "User";
+  id: Scalars["String"];
+  username: Scalars["String"];
+  email: Scalars["String"];
 };
 
 export type LoginOutput = {
-  __typename?: 'loginOutput';
-  id: Scalars['String'];
-  username: Scalars['String'];
-  email: Scalars['String'];
-  token: Scalars['String'];
+  __typename?: "loginOutput";
+  id: Scalars["String"];
+  username: Scalars["String"];
+  email: Scalars["String"];
+  token: Scalars["String"];
 };
 
 export type RegisterInput = {
-  username: Scalars['String'];
-  email: Scalars['String'];
-  password: Scalars['String'];
+  username: Scalars["String"];
+  email: Scalars["String"];
+  password: Scalars["String"];
+};
+
+export type LoginMutationVariables = Exact<{
+  email: Scalars["String"];
+  password: Scalars["String"];
+}>;
+
+export type LoginMutation = {
+  __typename?: "Mutation";
+  login: {
+    __typename?: "loginOutput";
+    id: string;
+    username: string;
+    email: string;
+    token: string;
+  };
 };
 
 export type RegisterMutationVariables = Exact<{
-  email: Scalars['String'];
-  username: Scalars['String'];
-  password: Scalars['String'];
+  email: Scalars["String"];
+  username: Scalars["String"];
+  password: Scalars["String"];
 }>;
 
+export type RegisterMutation = {
+  __typename?: "Mutation";
+  register: {
+    __typename?: "User";
+    id: string;
+    username: string;
+    email: string;
+  };
+};
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'User', id: string, username: string, email: string } };
+export type HelloQueryVariables = Exact<{ [key: string]: never }>;
 
-export type HelloQueryVariables = Exact<{ [key: string]: never; }>;
+export type HelloQuery = { __typename?: "Query"; hello: string };
 
-
-export type HelloQuery = { __typename?: 'Query', hello: string };
-
-
+export const LoginDocument = `
+    mutation login($email: String!, $password: String!) {
+  login(email: $email, password: $password) {
+    id
+    username
+    email
+    token
+  }
+}
+    `;
+export const useLoginMutation = <TError = unknown, TContext = unknown>(
+  options?: UseMutationOptions<
+    LoginMutation,
+    TError,
+    LoginMutationVariables,
+    TContext
+  >
+) =>
+  useMutation<LoginMutation, TError, LoginMutationVariables, TContext>(
+    (variables?: LoginMutationVariables) =>
+      fetcher<LoginMutation, LoginMutationVariables>(
+        LoginDocument,
+        variables
+      )(),
+    options
+  );
 export const RegisterDocument = `
     mutation register($email: String!, $username: String!, $password: String!) {
   register(input: {email: $email, password: $password, username: $username}) {
@@ -128,28 +182,33 @@ export const RegisterDocument = `
   }
 }
     `;
-export const useRegisterMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<RegisterMutation, TError, RegisterMutationVariables, TContext>) => 
-    useMutation<RegisterMutation, TError, RegisterMutationVariables, TContext>(
-      (variables?: RegisterMutationVariables) => fetcher<RegisterMutation, RegisterMutationVariables>(RegisterDocument, variables)(),
-      options
-    );
+export const useRegisterMutation = <TError = unknown, TContext = unknown>(
+  options?: UseMutationOptions<
+    RegisterMutation,
+    TError,
+    RegisterMutationVariables,
+    TContext
+  >
+) =>
+  useMutation<RegisterMutation, TError, RegisterMutationVariables, TContext>(
+    (variables?: RegisterMutationVariables) =>
+      fetcher<RegisterMutation, RegisterMutationVariables>(
+        RegisterDocument,
+        variables
+      )(),
+    options
+  );
 export const HelloDocument = `
     query hello {
   hello
 }
     `;
-export const useHelloQuery = <
-      TData = HelloQuery,
-      TError = unknown
-    >(
-      variables?: HelloQueryVariables, 
-      options?: UseQueryOptions<HelloQuery, TError, TData>
-    ) => 
-    useQuery<HelloQuery, TError, TData>(
-      ['hello', variables],
-      fetcher<HelloQuery, HelloQueryVariables>(HelloDocument, variables),
-      options
-    );
+export const useHelloQuery = <TData = HelloQuery, TError = unknown>(
+  variables?: HelloQueryVariables,
+  options?: UseQueryOptions<HelloQuery, TError, TData>
+) =>
+  useQuery<HelloQuery, TError, TData>(
+    ["hello", variables],
+    fetcher<HelloQuery, HelloQueryVariables>(HelloDocument, variables),
+    options
+  );

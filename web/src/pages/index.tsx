@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   FormControl,
   FormHelperText,
   FormLabel,
@@ -9,35 +10,19 @@ import {
 import { useRouter } from "next/dist/client/router";
 import React from "react";
 import { useHelloQuery, useRegisterMutation } from "../generated";
+import RegisterForm from "./register";
 
 function home() {
   const router = useRouter();
   const { mutate, isLoading, error, isError, isSuccess } = useRegisterMutation({
     onSuccess: () => router.push("/dash"),
   });
+
   return (
-    <Box display="flex" alignItems="center" justifyContent="center">
-      <form noValidate>
-        <VStack>
-          <FormControl id="email">
-            <FormLabel>Email address</FormLabel>
-            <Input type="email" />
-            <FormHelperText>We'll never share your email</FormHelperText>
-          </FormControl>
-          <FormControl id="username">
-            <FormLabel>Username</FormLabel>
-            <Input type="username" />
-          </FormControl>
-          <FormControl id="password">
-            <FormLabel>Password</FormLabel>
-            <Input type="password" />
-          </FormControl>
-          <FormControl id="confirmPassword">
-            <FormLabel>Confirm Password</FormLabel>
-            <Input type="password" />
-          </FormControl>
-        </VStack>
-      </form>
+    <Box>
+      <Box display="flex" justifyContent="center" alignItems="center" mt="14">
+        <RegisterForm />
+      </Box>
     </Box>
   );
 }
