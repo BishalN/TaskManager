@@ -37,7 +37,10 @@ export class registerResolver {
 
       // set the refresh token to the cookie of the browser
 
-      res.cookie("jid", generateRefreshToken(user.id), { httpOnly: true });
+      res.cookie("jid", generateRefreshToken(user.id), {
+        httpOnly: true,
+        path: "/refresh_token",
+      });
 
       const token = generateAccessToken(user.id);
 

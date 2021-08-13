@@ -1,12 +1,51 @@
 import React from "react";
-import { isServer } from "../utils/isServer";
-import { useIsLoggedIn } from "../hooks/useIsLoggedIn";
+import { useGetMyTasksQuery, useMeQuery } from "../generated";
+
+import { Box, Text, Tooltip, VStack } from "@chakra-ui/react";
+import { CreateModal } from "../../components/createModal";
+import { EditModal } from "../../components/editModal";
+import { AlertDialogEx } from "../../components/AlertDialog";
 
 export default function dash() {
-  let userInfo;
-  if (!isServer) userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const { data } = useMeQuery();
+  const { isLoading, data: taskData } = useGetMyTasksQuery();
 
-  console.log(userInfo);
-  useIsLoggedIn();
-  return <div>welcome to the app</div>;
+  return (
+    <div>
+      <VStack margin="10">
+        {isLoading && <Text>Loading tasks...</Text>}
+        <Text fontSize="xl" alignSelf="start">
+          Welcome {data?.me.username}
+        </Text>
+        <CreateModal alignSelf="start" />
+        {taskData &&
+          taskData.getAllMyTasks.map((task) => (
+            <Box
+              key={task.id}
+              w={["xs", "sm", "xl"]}
+              bg={
+                task.status === "active"
+                  ? "blue.400"
+                  : task.status === "completed"
+                  ? "green.400"
+                  : "red.400"
+              }
+              p="3"
+              rounded="lg"
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Tooltip label={task.status}>
+                <Text color="white">{task.title}</Text>
+              </Tooltip>
+              <Box>
+                <EditModal task={task} />
+                <AlertDialogEx task={task} />
+              </Box>
+            </Box>
+          ))}
+      </VStack>
+    </div>
+  );
 }

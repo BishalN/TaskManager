@@ -1,14 +1,15 @@
-import { Authorized, Ctx, Query, Resolver } from "type-graphql";
+import { Authorized, Ctx, Query, Resolver, UseMiddleware } from "type-graphql";
 import { User } from "../../entity/User";
 import { MyContext } from "../../types/MyContext";
-import { currentlyLoggedInUserId } from "../../utils/currentlyLoggedUserId";
+import { isAuth } from "../../utils/isAuth";
 
 @Resolver()
 export class helloResolver {
-  @Authorized()
   @Query(() => User, { nullable: true })
-  async me(@Ctx() { req }: MyContext) {
-    const user = await User.findOne(currentlyLoggedInUserId(req));
+  @UseMiddleware(isAuth)
+  async me(@Ctx() { payload }: MyContext) {
+    const userId = payload.userId;
+    const user = await User.findOne(userId);
     return user;
   }
 

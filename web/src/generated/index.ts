@@ -4,7 +4,7 @@ import {
   useQuery,
   UseQueryOptions,
 } from "react-query";
-import { isServer } from "../utils/isServer";
+import { getAccessToken } from "../utils/token";
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = {
   [K in keyof T]: T[K];
@@ -14,31 +14,15 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
   { [SubKey in K]: Maybe<T[SubKey]> };
 
-export function fetcher<TData, TVariables>(
-  query: string,
-  variables?: TVariables
-) {
-  let token = "";
-  if (!isServer) {
-    const userInfo = localStorage.getItem("userInfo");
-    if (userInfo) {
-      const parsedInfo = JSON.parse(userInfo);
-      token = parsedInfo.token;
-    }
-  }
-
-  let userInfo;
-  if (!isServer) userInfo = JSON.parse(localStorage.getItem("userInfo"));
-
-  console.log(userInfo);
-
+function fetcher<TData, TVariables>(query: string, variables?: TVariables) {
+  const token = getAccessToken();
   return async (): Promise<TData> => {
     const res = await fetch("http://localhost:4000/graphql", {
       method: "POST",
       body: JSON.stringify({ query, variables }),
       headers: {
-        "Content-Type": "apllication/json",
-        Authorization: `Bearer ${userInfo.token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -53,7 +37,6 @@ export function fetcher<TData, TVariables>(
     return json.data;
   };
 }
-
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -163,6 +146,45 @@ export type RegisterMutation = {
   };
 };
 
+export type CreateTaskMutationVariables = Exact<{
+  title: Scalars["String"];
+}>;
+
+export type CreateTaskMutation = {
+  __typename?: "Mutation";
+  createTask: {
+    __typename?: "Task";
+    id: string;
+    title: string;
+    status: string;
+  };
+};
+
+export type UpdateTaskMutationVariables = Exact<{
+  id: Scalars["String"];
+  title?: Maybe<Scalars["String"]>;
+  status?: Maybe<Scalars["String"]>;
+}>;
+
+export type UpdateTaskMutation = {
+  __typename?: "Mutation";
+  updateTask: {
+    __typename?: "Task";
+    id: string;
+    title: string;
+    status: string;
+  };
+};
+
+export type DeleteTaskMutationVariables = Exact<{
+  id: Scalars["String"];
+}>;
+
+export type DeleteTaskMutation = {
+  __typename?: "Mutation";
+  deleteTask: boolean;
+};
+
 export type HelloQueryVariables = Exact<{ [key: string]: never }>;
 
 export type HelloQuery = { __typename?: "Query"; hello: string };
@@ -176,6 +198,18 @@ export type MeQuery = {
     id: string;
     username: string;
     email: string;
+  }>;
+};
+
+export type GetMyTasksQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetMyTasksQuery = {
+  __typename?: "Query";
+  getAllMyTasks: Array<{
+    __typename?: "Task";
+    id: string;
+    title: string;
+    status: string;
   }>;
 };
 
@@ -230,6 +264,92 @@ export const useRegisterMutation = <TError = unknown, TContext = unknown>(
       )(),
     options
   );
+export const CreateTaskDocument = `
+    mutation createTask($title: String!) {
+  createTask(title: $title) {
+    id
+    title
+    status
+  }
+}
+    `;
+export const useCreateTaskMutation = <TError = unknown, TContext = unknown>(
+  options?: UseMutationOptions<
+    CreateTaskMutation,
+    TError,
+    CreateTaskMutationVariables,
+    TContext
+  >
+) =>
+  useMutation<
+    CreateTaskMutation,
+    TError,
+    CreateTaskMutationVariables,
+    TContext
+  >(
+    (variables?: CreateTaskMutationVariables) =>
+      fetcher<CreateTaskMutation, CreateTaskMutationVariables>(
+        CreateTaskDocument,
+        variables
+      )(),
+    options
+  );
+export const UpdateTaskDocument = `
+    mutation updateTask($id: String!, $title: String, $status: String) {
+  updateTask(id: $id, title: $title, status: $status) {
+    id
+    title
+    status
+  }
+}
+    `;
+export const useUpdateTaskMutation = <TError = unknown, TContext = unknown>(
+  options?: UseMutationOptions<
+    UpdateTaskMutation,
+    TError,
+    UpdateTaskMutationVariables,
+    TContext
+  >
+) =>
+  useMutation<
+    UpdateTaskMutation,
+    TError,
+    UpdateTaskMutationVariables,
+    TContext
+  >(
+    (variables?: UpdateTaskMutationVariables) =>
+      fetcher<UpdateTaskMutation, UpdateTaskMutationVariables>(
+        UpdateTaskDocument,
+        variables
+      )(),
+    options
+  );
+export const DeleteTaskDocument = `
+    mutation deleteTask($id: String!) {
+  deleteTask(id: $id)
+}
+    `;
+export const useDeleteTaskMutation = <TError = unknown, TContext = unknown>(
+  options?: UseMutationOptions<
+    DeleteTaskMutation,
+    TError,
+    DeleteTaskMutationVariables,
+    TContext
+  >
+) =>
+  useMutation<
+    DeleteTaskMutation,
+    TError,
+    DeleteTaskMutationVariables,
+    TContext
+  >(
+    (variables?: DeleteTaskMutationVariables) =>
+      fetcher<DeleteTaskMutation, DeleteTaskMutationVariables>(
+        DeleteTaskDocument,
+        variables
+      )(),
+    options
+  );
 export const HelloDocument = `
     query hello {
   hello
@@ -260,5 +380,26 @@ export const useMeQuery = <TData = MeQuery, TError = unknown>(
   useQuery<MeQuery, TError, TData>(
     ["me", variables],
     fetcher<MeQuery, MeQueryVariables>(MeDocument, variables),
+    options
+  );
+export const GetMyTasksDocument = `
+    query getMyTasks {
+  getAllMyTasks {
+    id
+    title
+    status
+  }
+}
+    `;
+export const useGetMyTasksQuery = <TData = GetMyTasksQuery, TError = unknown>(
+  variables?: GetMyTasksQueryVariables,
+  options?: UseQueryOptions<GetMyTasksQuery, TError, TData>
+) =>
+  useQuery<GetMyTasksQuery, TError, TData>(
+    ["getMyTasks", variables],
+    fetcher<GetMyTasksQuery, GetMyTasksQueryVariables>(
+      GetMyTasksDocument,
+      variables
+    ),
     options
   );

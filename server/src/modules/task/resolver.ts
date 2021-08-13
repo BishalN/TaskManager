@@ -16,7 +16,6 @@ import { isUsersTask } from "./isUsersTask";
 
 @Resolver()
 export class taskResolver {
-  @Authorized()
   @Mutation(() => Task)
   @UseMiddleware(isAuth)
   async createTask(
@@ -38,7 +37,7 @@ export class taskResolver {
   @UseMiddleware(isAuth)
   async getAllMyTasks(@Ctx() { payload }: MyContext) {
     const id = payload.userId;
-    const myTasks = await Task.find({ where: { id } });
+    const myTasks = await Task.find({ where: { user: id } });
     return myTasks;
   }
 

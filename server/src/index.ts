@@ -21,9 +21,10 @@ const main = async () => {
   const path = "/graphql";
   await createTypeormConnection();
   const app = express();
+
   app.use(cookieParser());
 
-  app.use(cors({ origin: "*", credentials: true }));
+  app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
   app.post("/refresh_token", async (req, res) => {
     const token = req.cookies.jid;
@@ -51,7 +52,10 @@ const main = async () => {
     //   return res.send({ ok: false, accessToken: "" });
     // }
 
-    res.cookie("jid", generateRefreshToken(user.id), { httpOnly: true });
+    res.cookie("jid", generateRefreshToken(user.id), {
+      httpOnly: true,
+      path: "/refresh_token",
+    });
 
     return res.send({ ok: true, accessToken: generateAccessToken(user.id) });
   });
