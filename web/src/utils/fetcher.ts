@@ -1,29 +1,17 @@
-import { isServer } from "react-query/types/core/utils";
+import { getAccessToken } from "./token";
 
 export function fetcher<TData, TVariables>(
   query: string,
   variables?: TVariables
 ) {
-  let token = "";
-  if (!isServer) {
-    const userInfo = localStorage.getItem("userInfo");
-    if (userInfo) {
-      const parsedInfo = JSON.parse(userInfo);
-      token = parsedInfo.token;
-    }
-  }
-
-  let userInfo;
-  if (!isServer) userInfo = JSON.parse(localStorage.getItem("userInfo"));
-
-  console.log(userInfo);
-
+  const token = getAccessToken();
   return async (): Promise<TData> => {
     const res = await fetch("http://localhost:4000/graphql", {
       method: "POST",
       body: JSON.stringify({ query, variables }),
+      credentials: "include",
       headers: {
-        "Content-Type": "apllication/json",
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     });

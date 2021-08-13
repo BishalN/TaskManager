@@ -16,10 +16,7 @@ function LoginForm() {
   const { mutateAsync, isLoading, error, data } = useLoginMutation({
     onError: () => console.log(error),
     onSuccess: () => {
-      if (data) {
-        localStorage.setItem("userInfo", JSON.stringify(data));
-        router.push("/dash");
-      }
+      router.push("/dash");
     },
   });
 

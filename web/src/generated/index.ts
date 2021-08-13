@@ -20,6 +20,7 @@ function fetcher<TData, TVariables>(query: string, variables?: TVariables) {
     const res = await fetch("http://localhost:4000/graphql", {
       method: "POST",
       body: JSON.stringify({ query, variables }),
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -37,6 +38,7 @@ function fetcher<TData, TVariables>(query: string, variables?: TVariables) {
     return json.data;
   };
 }
+
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -50,6 +52,7 @@ export type Mutation = {
   __typename?: "Mutation";
   register: User;
   login: LoginOutput;
+  logout: Scalars["Boolean"];
   createTask: Task;
   deleteTask: Scalars["Boolean"];
   updateTask: Task;
@@ -129,6 +132,10 @@ export type LoginMutation = {
     token: string;
   };
 };
+
+export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
+
+export type LogoutMutation = { __typename?: "Mutation"; logout: boolean };
 
 export type RegisterMutationVariables = Exact<{
   email: Scalars["String"];
@@ -235,6 +242,27 @@ export const useLoginMutation = <TError = unknown, TContext = unknown>(
     (variables?: LoginMutationVariables) =>
       fetcher<LoginMutation, LoginMutationVariables>(
         LoginDocument,
+        variables
+      )(),
+    options
+  );
+export const LogoutDocument = `
+    mutation logout {
+  logout
+}
+    `;
+export const useLogoutMutation = <TError = unknown, TContext = unknown>(
+  options?: UseMutationOptions<
+    LogoutMutation,
+    TError,
+    LogoutMutationVariables,
+    TContext
+  >
+) =>
+  useMutation<LogoutMutation, TError, LogoutMutationVariables, TContext>(
+    (variables?: LogoutMutationVariables) =>
+      fetcher<LogoutMutation, LogoutMutationVariables>(
+        LogoutDocument,
         variables
       )(),
     options

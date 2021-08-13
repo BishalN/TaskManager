@@ -51,4 +51,11 @@ export class registerResolver {
       throw new Error(error);
     }
   }
+
+  // to log out the user
+  @Mutation(() => Boolean)
+  logout(@Ctx() { res }: MyContext) {
+    res.clearCookie("jid");
+    return true;
+  }
 }
