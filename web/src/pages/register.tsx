@@ -22,7 +22,7 @@ function RegisterForm() {
   const { mutateAsync, isLoading, error, isError, isSuccess, data } =
     useRegisterMutation({
       onError: () => console.log(error),
-      onSuccess: () => router.push("/login"),
+      onSuccess: () => router.push("/login?reg=1"),
     });
 
   function validateEmail(value: string) {

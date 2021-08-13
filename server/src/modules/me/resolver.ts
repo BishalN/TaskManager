@@ -1,10 +1,11 @@
-import { Ctx, Query, Resolver } from 'type-graphql';
-import { User } from '../../entity/User';
-import { MyContext } from '../../types/MyContext';
-import { currentlyLoggedInUserId } from '../../utils/currentlyLoggedUserId';
+import { Authorized, Ctx, Query, Resolver } from "type-graphql";
+import { User } from "../../entity/User";
+import { MyContext } from "../../types/MyContext";
+import { currentlyLoggedInUserId } from "../../utils/currentlyLoggedUserId";
 
 @Resolver()
 export class helloResolver {
+  @Authorized()
   @Query(() => User, { nullable: true })
   async me(@Ctx() { req }: MyContext) {
     const user = await User.findOne(currentlyLoggedInUserId(req));
@@ -13,6 +14,6 @@ export class helloResolver {
 
   @Query(() => String)
   hello() {
-    return "hello world"
+    return "hello world";
   }
 }

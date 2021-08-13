@@ -4,6 +4,7 @@ import {
   useQuery,
   UseQueryOptions,
 } from "react-query";
+import { isServer } from "../utils/isServer";
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = {
   [K in keyof T]: T[K];
@@ -13,13 +14,31 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
   { [SubKey in K]: Maybe<T[SubKey]> };
 
-function fetcher<TData, TVariables>(query: string, variables?: TVariables) {
+export function fetcher<TData, TVariables>(
+  query: string,
+  variables?: TVariables
+) {
+  let token = "";
+  if (!isServer) {
+    const userInfo = localStorage.getItem("userInfo");
+    if (userInfo) {
+      const parsedInfo = JSON.parse(userInfo);
+      token = parsedInfo.token;
+    }
+  }
+
+  let userInfo;
+  if (!isServer) userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
+  console.log(userInfo);
+
   return async (): Promise<TData> => {
     const res = await fetch("http://localhost:4000/graphql", {
       method: "POST",
       body: JSON.stringify({ query, variables }),
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "apllication/json",
+        Authorization: `Bearer ${userInfo.token}`,
       },
     });
 
@@ -34,6 +53,7 @@ function fetcher<TData, TVariables>(query: string, variables?: TVariables) {
     return json.data;
   };
 }
+
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -147,6 +167,18 @@ export type HelloQueryVariables = Exact<{ [key: string]: never }>;
 
 export type HelloQuery = { __typename?: "Query"; hello: string };
 
+export type MeQueryVariables = Exact<{ [key: string]: never }>;
+
+export type MeQuery = {
+  __typename?: "Query";
+  me?: Maybe<{
+    __typename?: "User";
+    id: string;
+    username: string;
+    email: string;
+  }>;
+};
+
 export const LoginDocument = `
     mutation login($email: String!, $password: String!) {
   login(email: $email, password: $password) {
@@ -210,5 +242,23 @@ export const useHelloQuery = <TData = HelloQuery, TError = unknown>(
   useQuery<HelloQuery, TError, TData>(
     ["hello", variables],
     fetcher<HelloQuery, HelloQueryVariables>(HelloDocument, variables),
+    options
+  );
+export const MeDocument = `
+    query me {
+  me {
+    id
+    username
+    email
+  }
+}
+    `;
+export const useMeQuery = <TData = MeQuery, TError = unknown>(
+  variables?: MeQueryVariables,
+  options?: UseQueryOptions<MeQuery, TError, TData>
+) =>
+  useQuery<MeQuery, TError, TData>(
+    ["me", variables],
+    fetcher<MeQuery, MeQueryVariables>(MeDocument, variables),
     options
   );

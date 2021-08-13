@@ -3,27 +3,23 @@ import {
   FormLabel,
   FormErrorMessage,
 } from "@chakra-ui/form-control";
-import { Input, Button, Box } from "@chakra-ui/react";
+import { Input, Button, Box, Alert, AlertIcon } from "@chakra-ui/react";
 import { Field, Form, Formik } from "formik";
 import { useRouter } from "next/dist/client/router";
 import React from "react";
 import validator from "validator";
 import { useLoginMutation, useRegisterMutation } from "../generated";
 
-interface error {
-  username?: string;
-  email?: string;
-  password?: string;
-  confirmPassword?: string;
-}
-
 function LoginForm() {
   const router = useRouter();
+
   const { mutateAsync, isLoading, error, data } = useLoginMutation({
     onError: () => console.log(error),
     onSuccess: () => {
-      localStorage.setItem("userInfo", JSON.stringify(data));
-      router.push("/dash");
+      if (data) {
+        localStorage.setItem("userInfo", JSON.stringify(data));
+        router.push("/dash");
+      }
     },
   });
 
@@ -33,16 +29,6 @@ function LoginForm() {
       error = "Email is required";
     } else if (!validator.isEmail(value)) {
       error = "Please enter a valid email";
-    }
-    return error;
-  }
-
-  function validateUsername(value: string) {
-    let error: string;
-    if (!value) {
-      error = "Username is required";
-    } else if (value.length < 3) {
-      error = "Username must be atleast 3 character long";
     }
     return error;
   }
@@ -65,6 +51,12 @@ function LoginForm() {
       mt="14"
       flexDirection="column"
     >
+      {router.query?.reg && (
+        <Alert status="success" w="lg" mb={4}>
+          <AlertIcon />
+          Successfully registered! Now you can login
+        </Alert>
+      )}
       <Formik
         initialValues={{
           email: "",

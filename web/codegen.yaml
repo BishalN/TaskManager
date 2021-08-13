@@ -10,3 +10,4 @@ generates:
     config:
       fetcher:
         endpoint: "http://localhost:4000/graphql"
+        isReactHook: true

@@ -1,69 +1,75 @@
-import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql';
-import { getConnection } from 'typeorm';
-import { Task } from '../../entity/Task';
-import { MyContext } from '../../types/MyContext';
-import { currentlyLoggedInUserId } from '../../utils/currentlyLoggedUserId';
-import { isUsersTask } from './isUsersTask';
+import {
+  Arg,
+  Authorized,
+  Ctx,
+  Mutation,
+  Query,
+  Resolver,
+  UseMiddleware,
+} from "type-graphql";
+import { getConnection } from "typeorm";
+import { Task } from "../../entity/Task";
+import { MyContext } from "../../types/MyContext";
+import { currentlyLoggedInUserId } from "../../utils/currentlyLoggedUserId";
+import { isAuth } from "../../utils/isAuth";
+import { isUsersTask } from "./isUsersTask";
 
 @Resolver()
 export class taskResolver {
   @Authorized()
   @Mutation(() => Task)
+  @UseMiddleware(isAuth)
   async createTask(
-    @Ctx() { req }: MyContext,
-    @Arg('title') title: string,
-    @Arg('status', { defaultValue: 'active' })
-    status: 'active' | 'completed' | 'archived'
+    @Ctx() { payload }: MyContext,
+    @Arg("title") title: string,
+    @Arg("status", { defaultValue: "active" })
+    status: "active" | "completed" | "archived"
   ): Promise<Task> {
     const task = Task.create({
       title,
       status,
-      user: currentlyLoggedInUserId(req),
+      user: payload.userId as any,
     });
     await task.save();
     return task;
   }
 
-  @Authorized()
   @Query(() => [Task])
-  async getAllMyTasks(@Ctx() { req }: MyContext) {
-    const user = (req.user as any).id;
-    const myTasks = await Task.find({ where: { user } });
+  @UseMiddleware(isAuth)
+  async getAllMyTasks(@Ctx() { payload }: MyContext) {
+    const id = payload.userId;
+    const myTasks = await Task.find({ where: { id } });
     return myTasks;
   }
 
-  @Authorized()
   @Mutation(() => Boolean)
-  async deleteTask(@Ctx() { req }: MyContext, @Arg('id') id: string) {
-    const { message, result } = await isUsersTask(
-      id,
-      currentlyLoggedInUserId(req)
-    );
+  @UseMiddleware(isAuth)
+  async deleteTask(@Ctx() { payload }: MyContext, @Arg("id") id: string) {
+    const userId = payload.userId;
+    const { message, result } = await isUsersTask(id, userId);
     if (!result) throw new Error(message);
     await Task.delete(id);
 
     return true;
   }
 
-  @Authorized()
   @Mutation(() => Task)
+  @UseMiddleware(isAuth)
   async updateTask(
-    @Ctx() { req }: MyContext,
-    @Arg('id') id: string,
-    @Arg('title', { nullable: true }) title: string,
-    @Arg('status', { nullable: true }) status: string
+    @Ctx() { payload }: MyContext,
+    @Arg("id") id: string,
+    @Arg("title", { nullable: true }) title: string,
+    @Arg("status", { nullable: true }) status: string
   ) {
-    const { message, result } = await isUsersTask(
-      id,
-      currentlyLoggedInUserId(req)
-    );
+    const userId = payload.userId;
+    const { message, result } = await isUsersTask(id, userId);
     if (!result) throw new Error(message);
     const updatedTask = await getConnection()
       .getRepository(Task)
-      .createQueryBuilder('task')
+      .createQueryBuilder("task")
       .update<Task>(Task, { title, status })
-      .where('task.id =:id', { id })
-      .returning('*')
+      .where("task.id =:id", { id })
+      .returning("*")
       .updateEntity(true)
       .execute();
     const taskResult = {
