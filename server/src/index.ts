@@ -24,7 +24,7 @@ const main = async () => {
 
   app.use(cookieParser());
 
-  app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+  app.use(cors({ origin: '*', credentials: true }));
 
   app.post('/refresh_token', async (req, res) => {
     const token = req.cookies.jid;

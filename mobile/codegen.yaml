@@ -1,0 +1,13 @@
+overwrite: true
+schema: 'https://task-manager-bishal.herokuapp.com/graphql/graphql'
+documents: 'graphql/**/*.graphql'
+generates:
+  src/generated/index.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-react-query
+    config:
+      fetcher:
+        endpoint: 'https://task-manager-bishal.herokuapp.com/graphql/graphql'
+        isReactHook: true

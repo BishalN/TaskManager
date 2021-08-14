@@ -31,7 +31,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield createTypeormConnection_1.createTypeormConnection();
     const app = express_1.default();
     app.use(cookie_parser_1.default());
-    app.use(cors_1.default({ origin: 'http://localhost:3000', credentials: true }));
+    app.use(cors_1.default({ origin: '*', credentials: true }));
     app.post('/refresh_token', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const token = req.cookies.jid;
         if (!token) {
