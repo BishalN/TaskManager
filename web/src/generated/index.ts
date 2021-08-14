@@ -3,8 +3,8 @@ import {
   UseMutationOptions,
   useQuery,
   UseQueryOptions,
-} from "react-query";
-import { getAccessToken } from "../utils/token";
+} from 'react-query';
+import { getAccessToken } from '../utils/token';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = {
   [K in keyof T]: T[K];
@@ -17,15 +17,18 @@ export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
 function fetcher<TData, TVariables>(query: string, variables?: TVariables) {
   const token = getAccessToken();
   return async (): Promise<TData> => {
-    const res = await fetch("http://localhost:4000/graphql", {
-      method: "POST",
-      body: JSON.stringify({ query, variables }),
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const res = await fetch(
+      'https://task-manager-bishal.herokuapp.com/graphql',
+      {
+        method: 'POST',
+        body: JSON.stringify({ query, variables }),
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     const json = await res.json();
 
@@ -49,12 +52,12 @@ export type Scalars = {
 };
 
 export type Mutation = {
-  __typename?: "Mutation";
+  __typename?: 'Mutation';
   register: User;
   login: LoginOutput;
-  logout: Scalars["Boolean"];
+  logout: Scalars['Boolean'];
   createTask: Task;
-  deleteTask: Scalars["Boolean"];
+  deleteTask: Scalars['Boolean'];
   updateTask: Task;
 };
 
@@ -63,69 +66,69 @@ export type MutationRegisterArgs = {
 };
 
 export type MutationLoginArgs = {
-  password: Scalars["String"];
-  email: Scalars["String"];
+  password: Scalars['String'];
+  email: Scalars['String'];
 };
 
 export type MutationCreateTaskArgs = {
-  status?: Maybe<Scalars["String"]>;
-  title: Scalars["String"];
+  status?: Maybe<Scalars['String']>;
+  title: Scalars['String'];
 };
 
 export type MutationDeleteTaskArgs = {
-  id: Scalars["String"];
+  id: Scalars['String'];
 };
 
 export type MutationUpdateTaskArgs = {
-  status?: Maybe<Scalars["String"]>;
-  title?: Maybe<Scalars["String"]>;
-  id: Scalars["String"];
+  status?: Maybe<Scalars['String']>;
+  title?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
 };
 
 export type Query = {
-  __typename?: "Query";
+  __typename?: 'Query';
   me?: Maybe<User>;
-  hello: Scalars["String"];
+  hello: Scalars['String'];
   getAllMyTasks: Array<Task>;
 };
 
 export type Task = {
-  __typename?: "Task";
-  id: Scalars["String"];
-  title: Scalars["String"];
-  status: Scalars["String"];
+  __typename?: 'Task';
+  id: Scalars['String'];
+  title: Scalars['String'];
+  status: Scalars['String'];
 };
 
 export type User = {
-  __typename?: "User";
-  id: Scalars["String"];
-  username: Scalars["String"];
-  email: Scalars["String"];
+  __typename?: 'User';
+  id: Scalars['String'];
+  username: Scalars['String'];
+  email: Scalars['String'];
 };
 
 export type LoginOutput = {
-  __typename?: "loginOutput";
-  id: Scalars["String"];
-  username: Scalars["String"];
-  email: Scalars["String"];
-  token: Scalars["String"];
+  __typename?: 'loginOutput';
+  id: Scalars['String'];
+  username: Scalars['String'];
+  email: Scalars['String'];
+  token: Scalars['String'];
 };
 
 export type RegisterInput = {
-  username: Scalars["String"];
-  email: Scalars["String"];
-  password: Scalars["String"];
+  username: Scalars['String'];
+  email: Scalars['String'];
+  password: Scalars['String'];
 };
 
 export type LoginMutationVariables = Exact<{
-  email: Scalars["String"];
-  password: Scalars["String"];
+  email: Scalars['String'];
+  password: Scalars['String'];
 }>;
 
 export type LoginMutation = {
-  __typename?: "Mutation";
+  __typename?: 'Mutation';
   login: {
-    __typename?: "loginOutput";
+    __typename?: 'loginOutput';
     id: string;
     username: string;
     email: string;
@@ -135,18 +138,18 @@ export type LoginMutation = {
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
 
-export type LogoutMutation = { __typename?: "Mutation"; logout: boolean };
+export type LogoutMutation = { __typename?: 'Mutation'; logout: boolean };
 
 export type RegisterMutationVariables = Exact<{
-  email: Scalars["String"];
-  username: Scalars["String"];
-  password: Scalars["String"];
+  email: Scalars['String'];
+  username: Scalars['String'];
+  password: Scalars['String'];
 }>;
 
 export type RegisterMutation = {
-  __typename?: "Mutation";
+  __typename?: 'Mutation';
   register: {
-    __typename?: "User";
+    __typename?: 'User';
     id: string;
     username: string;
     email: string;
@@ -154,13 +157,13 @@ export type RegisterMutation = {
 };
 
 export type CreateTaskMutationVariables = Exact<{
-  title: Scalars["String"];
+  title: Scalars['String'];
 }>;
 
 export type CreateTaskMutation = {
-  __typename?: "Mutation";
+  __typename?: 'Mutation';
   createTask: {
-    __typename?: "Task";
+    __typename?: 'Task';
     id: string;
     title: string;
     status: string;
@@ -168,15 +171,15 @@ export type CreateTaskMutation = {
 };
 
 export type UpdateTaskMutationVariables = Exact<{
-  id: Scalars["String"];
-  title?: Maybe<Scalars["String"]>;
-  status?: Maybe<Scalars["String"]>;
+  id: Scalars['String'];
+  title?: Maybe<Scalars['String']>;
+  status?: Maybe<Scalars['String']>;
 }>;
 
 export type UpdateTaskMutation = {
-  __typename?: "Mutation";
+  __typename?: 'Mutation';
   updateTask: {
-    __typename?: "Task";
+    __typename?: 'Task';
     id: string;
     title: string;
     status: string;
@@ -184,24 +187,24 @@ export type UpdateTaskMutation = {
 };
 
 export type DeleteTaskMutationVariables = Exact<{
-  id: Scalars["String"];
+  id: Scalars['String'];
 }>;
 
 export type DeleteTaskMutation = {
-  __typename?: "Mutation";
+  __typename?: 'Mutation';
   deleteTask: boolean;
 };
 
 export type HelloQueryVariables = Exact<{ [key: string]: never }>;
 
-export type HelloQuery = { __typename?: "Query"; hello: string };
+export type HelloQuery = { __typename?: 'Query'; hello: string };
 
 export type MeQueryVariables = Exact<{ [key: string]: never }>;
 
 export type MeQuery = {
-  __typename?: "Query";
+  __typename?: 'Query';
   me?: Maybe<{
-    __typename?: "User";
+    __typename?: 'User';
     id: string;
     username: string;
     email: string;
@@ -211,9 +214,9 @@ export type MeQuery = {
 export type GetMyTasksQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetMyTasksQuery = {
-  __typename?: "Query";
+  __typename?: 'Query';
   getAllMyTasks: Array<{
-    __typename?: "Task";
+    __typename?: 'Task';
     id: string;
     title: string;
     status: string;
@@ -388,7 +391,7 @@ export const useHelloQuery = <TData = HelloQuery, TError = unknown>(
   options?: UseQueryOptions<HelloQuery, TError, TData>
 ) =>
   useQuery<HelloQuery, TError, TData>(
-    ["hello", variables],
+    ['hello', variables],
     fetcher<HelloQuery, HelloQueryVariables>(HelloDocument, variables),
     options
   );
@@ -406,7 +409,7 @@ export const useMeQuery = <TData = MeQuery, TError = unknown>(
   options?: UseQueryOptions<MeQuery, TError, TData>
 ) =>
   useQuery<MeQuery, TError, TData>(
-    ["me", variables],
+    ['me', variables],
     fetcher<MeQuery, MeQueryVariables>(MeDocument, variables),
     options
   );
@@ -424,7 +427,7 @@ export const useGetMyTasksQuery = <TData = GetMyTasksQuery, TError = unknown>(
   options?: UseQueryOptions<GetMyTasksQuery, TError, TData>
 ) =>
   useQuery<GetMyTasksQuery, TError, TData>(
-    ["getMyTasks", variables],
+    ['getMyTasks', variables],
     fetcher<GetMyTasksQuery, GetMyTasksQueryVariables>(
       GetMyTasksDocument,
       variables
