@@ -1,11 +1,26 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {QueryClientProvider, QueryClient} from 'react-query';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+
+import {Register} from './screens/Register';
+import {Login} from './screens/Login';
+import {Dash} from './screens/Dash';
+
+const queryClient = new QueryClient();
+const Stack = createNativeStackNavigator();
 
 const App = () => {
   return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <Text>Try editing me! 🎉</Text>
-    </View>
+    <QueryClientProvider client={queryClient}>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Register" component={Register} />
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Dash" component={Dash} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </QueryClientProvider>
   );
 };
 

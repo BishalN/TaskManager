@@ -11,9 +11,14 @@
     "generate": "graphql-codegen --config codegen.yaml"
   },
   "dependencies": {
+    "@react-navigation/native": "^6.0.2",
+    "@react-navigation/native-stack": "^6.0.5",
+    "formik": "^2.2.9",
     "graphql": "^15.5.1",
     "react": "17.0.1",
     "react-native": "0.64.1",
+    "react-native-safe-area-context": "^3.3.0",
+    "react-native-screens": "^3.5.0",
     "react-query": "^3.19.6"
   },
   "devDependencies": {
