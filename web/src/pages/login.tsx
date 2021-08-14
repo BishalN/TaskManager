@@ -2,13 +2,14 @@ import {
   FormControl,
   FormLabel,
   FormErrorMessage,
-} from "@chakra-ui/form-control";
-import { Input, Button, Box, Alert, AlertIcon } from "@chakra-ui/react";
-import { Field, Form, Formik } from "formik";
-import { useRouter } from "next/dist/client/router";
-import React from "react";
-import validator from "validator";
-import { useLoginMutation, useRegisterMutation } from "../generated";
+} from '@chakra-ui/form-control';
+import { Input, Button, Box, Alert, AlertIcon } from '@chakra-ui/react';
+import { Field, Form, Formik } from 'formik';
+import { useRouter } from 'next/dist/client/router';
+import React from 'react';
+import validator from 'validator';
+import { useLoginMutation, useRegisterMutation } from '../generated';
+import { setAccessToken } from '../utils/token';
 
 function LoginForm() {
   const router = useRouter();
@@ -16,16 +17,16 @@ function LoginForm() {
   const { mutateAsync, isLoading, error, data } = useLoginMutation({
     onError: () => console.log(error),
     onSuccess: () => {
-      router.push("/dash");
+      router.push('/dash');
     },
   });
 
   function validateEmail(value: string) {
     let error: string;
     if (!value) {
-      error = "Email is required";
+      error = 'Email is required';
     } else if (!validator.isEmail(value)) {
-      error = "Please enter a valid email";
+      error = 'Please enter a valid email';
     }
     return error;
   }
@@ -33,73 +34,74 @@ function LoginForm() {
   function validatePassword(value: string) {
     let error: string;
     if (!value) {
-      error = "Password is required";
+      error = 'Password is required';
     } else if (value.length < 3) {
-      error = "Password must be atleast 6 character long";
+      error = 'Password must be atleast 6 character long';
     }
     return error;
   }
 
   return (
     <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      mt="14"
-      flexDirection="column"
+      display='flex'
+      justifyContent='center'
+      alignItems='center'
+      mt='14'
+      flexDirection='column'
     >
       {router.query?.reg && (
-        <Alert status="success" w="lg" mb={4}>
+        <Alert status='success' w='lg' mb={4}>
           <AlertIcon />
           Successfully registered! Now you can login
         </Alert>
       )}
       <Formik
         initialValues={{
-          email: "",
-          password: "",
+          email: '',
+          password: '',
         }}
         onSubmit={async (values, { setErrors }) => {
           try {
             const res = await mutateAsync(values);
+            setAccessToken(res.login.token);
           } catch (error) {
             setErrors({
-              email: error.message.includes("credentials") && error.message,
-              password: error.message.includes("credentials") && error.message,
+              email: error.message.includes('credentials') && error.message,
+              password: error.message.includes('credentials') && error.message,
             });
           }
         }}
       >
         {(props) => (
-          <Form autoComplete="off" autoCorrect="off">
-            <Field name="email" validate={validateEmail}>
+          <Form autoComplete='off' autoCorrect='off'>
+            <Field name='email' validate={validateEmail}>
               {({ field, form }) => (
                 <FormControl
                   isInvalid={form.errors.email && form.touched.email}
                 >
-                  <FormLabel htmlFor="email">Email Address</FormLabel>
+                  <FormLabel htmlFor='email'>Email Address</FormLabel>
                   <Input
                     {...field}
-                    id="email"
-                    placeholder="Email Address"
-                    w="sm"
+                    id='email'
+                    placeholder='Email Address'
+                    w='sm'
                   />
                   <FormErrorMessage>{form.errors.email}</FormErrorMessage>
                 </FormControl>
               )}
             </Field>
 
-            <Field name="password" validate={validatePassword}>
+            <Field name='password' validate={validatePassword}>
               {({ field, form }) => (
                 <FormControl
                   isInvalid={form.errors.password && form.touched.password}
                 >
-                  <FormLabel htmlFor="password">Password</FormLabel>
+                  <FormLabel htmlFor='password'>Password</FormLabel>
                   <Input
-                    type="password"
+                    type='password'
                     {...field}
-                    id="password"
-                    placeholder="Password"
+                    id='password'
+                    placeholder='Password'
                   />
                   <FormErrorMessage>{form.errors.password}</FormErrorMessage>
                 </FormControl>
@@ -108,14 +110,14 @@ function LoginForm() {
 
             <Button
               mt={4}
-              colorScheme="teal"
+              colorScheme='teal'
               isLoading={isLoading}
-              type="submit"
+              type='submit'
             >
               Submit
             </Button>
 
-            <Button mt={4} ml={4} onClick={() => router.push("/register")}>
+            <Button mt={4} ml={4} onClick={() => router.push('/register')}>
               Don't have an account? Register
             </Button>
           </Form>
