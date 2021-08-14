@@ -12,12 +12,9 @@
     "database": "taskmanager_dev"
   },
   {
-    "name": "test",
+    "name": "production",
     "type": "postgres",
-    "host": "localhost",
-    "port": 5432,
-    "username": "postgres",
-    "password": "ben",
-    "database": "taskmanager_test"
+    "synchronize": true,
+    "logging": true
   }
 ]

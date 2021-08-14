@@ -1,5 +1,5 @@
 #! /bin/bash
-yarn build:server
+yarn build
 heroku container:push --app=task-manager-bishal web
 heroku container:release --app=task-manager-bishal web
 # docker build -t benawad/abb:latest .
